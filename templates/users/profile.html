@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+
+{% block headerbar %}
+	<div id="header-bar" class="col-sm-12 clearfix">
+        <h4 class="col-xs-6 col-sm-4">{{title}}</h4>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="card">
+    	<div class="card-header">
+	        <h3>Basic Info<small></small></h2>
+	 	</div>
+	 	<div class="card-body table-responsive">
+	    	<table class="table table-striped" >
+	    		<tr>
+	    			<td>Username</td>
+	    			<td>{{instance.user.username}}</td>
+	    		</tr>
+	    		<tr>
+	    			<td>Name</td>
+	    			<td>{{instance.name}}</td>
+	    		</tr>
+	    		<tr>
+	    			<td>Phone</td>
+	    			<td>{{instance.phone}}</td>
+	    		</tr>
+	    		<tr>
+	    			<td>Email</td>
+	    			<td>{{instance.user.email}}</td>
+	    		</tr>
+	    		<tr>
+	    			<td>User Type</td>
+	    			<td>{{instance.user_type}}</td>
+	    		</tr>
+	    		<tr>
+	    			<td>Address</td>
+	    			<td>{{instance.address}}</td>
+	    		</tr>
+	    	</table>
+    	</div>
+    </div>
+	<div class="card">
+	    <div class="card-header">
+	        <h3>Created &amp; Updated <small></small></h3>
+	    </div>
+	    <div class="card-body table-responsive">
+		    <table class="table table-striped">
+			    	<tr>
+		    			<td>Created</td>
+		    			<td>{{instance.date_added}}</td>
+		    		</tr>
+		    		<tr>
+		    			<td>Updated</td>
+		    			<td>{{instance.date_updated}}</td>
+		    		</tr>
+		    </table>
+	    </div>
+	</div>
+	<div class="card">
+	    <div class="card-header">
+	        <h3>Creator &amp; Updater <small></small></h3>
+	    </div>
+	    <div class="card-body table-responsive">
+		    <table class="table table-striped">
+			    	<tr>
+		    			<td>Creator</td>
+		    			<td>{{instance.creator}}</td>
+		    		</tr>
+		    		<tr>
+		    			<td>Updater</td>
+		    			<td>{{instance.updater}}</td>
+		    		</tr>
+		    </table>
+	    </div>
+	</div>
+{% endblock %}
+
+{% block static %}
+	{% load static %}
+{% endblock %}

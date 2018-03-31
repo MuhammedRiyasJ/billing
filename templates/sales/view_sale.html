@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block headerbar %}
+    <div id="header-bar" class="col-sm-12 clearfix">
+        <h4 class="col-xs-6 col-sm-4">{{title}}</h4>
+         <div class="btn-group pull-right">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirm-print" ><i class="glyphicon glyphicon-print visible-xs"></i><span class="hidden-xs">Print</span></button>
+            <a href="{% url 'sales:create_sale' %}" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-file visible-xs"></i><span class="hidden-xs">Create</span></a>
+            <a href="{% url 'sales:edit_sale' pk=instance.pk %}" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-pencil visible-xs"></i><span class="hidden-xs">Edit</span></a>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirm-delete" ><i class="glyphicon glyphicon-trash visible-xs"></i><span class="hidden-xs">Delete</span></button>
+        </div>
+    </div>
+    <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content alert alert-danger">
+                <div class="modal-body">
+                    Are You Sure ?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <a href="{% url 'sales:delete_sale' pk=instance.pk %}" class="btn btn-danger btn-ok">Delete</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="confirm-print" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="model-header">
+                    <h3 class="text-center">Bill Type</h3>
+                </div>
+                <div class="modal-body">
+                    <ul>
+                        <li> <a href="{% url 'sales:print_sale_8b' pk=instance.pk %}" class=""><b>ORIGINAL FOR RECIPIENT</b></a></li>
+                        <li> <a href="{% url 'sales:print_sale_8' pk=instance.pk %}" class=""><b>DUPLICATE FOR TRANSPORTER/SUPPLIER</b></a></li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+
+    {% if message %}
+        <div class="alert alert-success alert-dismissable fade in">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <strong>Success!</strong> {{message}}
+        </div>
+    {% endif %}
+
+    <div class="card">
+        <div class="card-header">
+            <h3>Basic Info<small></small></h2>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped" >
+                <tr>
+                    <td>Date</td>
+                    <td>{{instance.date|date:'d-m-y'}}</td>
+                </tr>
+                <tr>
+                    <td>Customer</td>
+                    <td>{{instance.customer|default:'-'}}</td>
+                </tr>
+                <tr>
+                    <td>Sale Id</td>
+                    <td>{{instance.sale_id|default:'-'}}</td>
+                </tr>
+                
+                <tr>
+                    <td>Sale Type</td>
+                    <td>{{instance.get_sale_type_display}}</td>
+                </tr>
+                <tr>
+                    <td>Total</td>
+                    <td>{{sale_list.3}}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    {% if sale_products %}
+        
+        <div class="table-responsive">
+            <div class="card-header">
+                <h3>Sale Info<small></small></h3>
+            </div>
+            <table id="data-table-basic" class="table table-striped table-vmiddle">
+                <thead>
+                    <tr>
+                        <th>SL.No</th>
+                        <th>Product</th>
+                        <th>Unit Price</th>
+                        <th>GST(%)</th>
+                        <th>Quantity</th>
+                        <th>Discount</th>
+                        <th>Net Amount</th>
+                        <th>GST Amount</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th colspan="5">
+                            Total
+                        </th>
+                        <td>
+                            {{sale_list.0|default:'0.00'}}
+                        </td>
+                        <td>
+                            {{sale_list.1}}
+                        </td>
+                        <td>
+                            {{sale_list.2}}
+                        </td>
+                        <td>
+                             {{sale_list.3}}
+                        </td>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    {% for instance in sale_products %}
+                    <tr class="check_items_row">
+                        <td>{{forloop.counter}}</td>
+                        <td>{{instance.product}}</td>
+                        <td>{{instance.unit_price}}</td>
+                        <td>{{instance.output_gst|default:'0.00'}}</td>
+                        <td>{{instance.quantity}}</td>
+                        <td>{{instance.offer|default:'0.00'}}</td>
+                        <td>{{instance.amount}}</td>
+                        <td>{{instance.tax_amount}}</td>
+                        <td>{{instance.total_amount}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+    {% endif %}
+
+	<div class="card">
+        <div class="card-header">
+            <h3>Created &amp; Updated <small></small></h3>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                    <tr>
+                        <td>Created</td>
+                        <td>{{instance.date_added|date:'d-m-y'}}</td>
+                    </tr>
+                    <tr>
+                        <td>Updated</td>
+                        <td>{{instance.date_updated|date:'d-m-y'|default:"-"}}</td>
+                    </tr>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block static %}
+	{% load static %}
+{% endblock %}

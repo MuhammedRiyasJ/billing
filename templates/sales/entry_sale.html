@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block headerbar %}
+	<div id="header-bar" class="col-sm-12 clearfix">
+        <h4 class="col-xs-4 col-sm-4">{{title}}</h4>
+    </div>
+{% endblock %}
+
+{% block content %}
+	{% if errors %}
+		<div class="alert alert-danger">
+		  <strong>Error!</strong> 
+		    {{errors | safe}}
+		</div>
+	{% endif %}
+
+	{% if admin %}
+		{% include 'includes/create_customer_popup.html' %}
+	{% endif %}
+
+	<form action="{{ url }}" method="post" class="form-horizontal">
+		{% csrf_token %}
+		<div class="form-group {% if form.date.errors %} has-error {% endif %} col-sm-3">
+            <label for="{{form.date.label.id_for_label}}" class="control-label col-sm-3">{{form.date.label}}</label>
+            <div class="col-sm-9">
+                <div class="fg-line">
+                    {{form.date}}
+                </div>
+            </div>
+        </div>
+         <div class="form-group {% if form.sale_type.errors %} has-error {% endif %} col-sm-4">
+            <label for="{{form.sale_type.label.id_for_label}}" class="control-label col-sm-5">{{form.sale_type.label}}</label>
+            <div class="col-sm-7">
+                <div class="fg-line">
+                    {{form.sale_type}}
+                </div>
+            </div>
+        </div>
+        <div class="form-group customer {% if form.customer.errors %} has-error {% endif %} col-sm-5">
+            <label for="{{form.customer.label.id_for_label}}" class="control-label col-sm-6">{{form.customer.label}} {% if admin %}<a href="#" data-toggle="modal" data-target="#create-customer"><span class="glyphicon glyphicon-plus"></span></a>{% endif %} </label>
+            <div class="col-sm-4">
+                <div class="fg-line">
+                    {{form.customer}}
+                </div>
+            </div>
+        </div>
+
+		<div class="clearfix"></div>
+		
+		<section class="innerBox">
+			<h3>Sold Item</h3>
+			<div class="sale_product_formset table-responsive">			        
+				<table class="table">
+					<thead>						
+						<tr>
+							<th>Product</th>
+							<th>Unit Price</th>
+							<th>GST(%)</th>
+							<th>Quantity</th>
+							<th>Discount</th>
+							<th>Net Amount</th>
+							<th>GST Amount</th>
+							<th>Total</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>	
+					{% for f in sale_product_formset.forms %}			    
+						<tr class="{% if f.instance.product.untaxed == True and current_user_profile.tax_only == True %}hidden{% else %}countable{% endif %} form_set_row">
+							<td>
+								{{ f.id }}
+								<span class="sale_product_product">									
+									{{ f.product }}
+								</span>
+							</td>
+							<td>
+								<span class="sale_product_unit_price">
+									{{ f.unit_price}}
+								</span>
+							</td>
+							<td>
+								<span class="sale_product_output_gst">
+									{{ f.output_gst }}
+								</span>
+							</td>
+							<td>
+								<span class="sale_product_quantity">
+									{{ f.quantity }}
+								</span>
+							</td>
+							<td>
+								<span class="sale_product_offer">
+									{{ f.offer}}
+								</span>
+							</td>
+							<td>
+								<span class="sale_product_amount">
+									{{ f.amount }}
+								</span>
+							</td>
+							<td>
+								<span class="sale_product_tax_amount">
+									{{ f.tax_amount }}
+								</span>
+							</td>
+							<td>
+								<span class="sale_product_total_amount">
+									{{ f.total_amount }}
+								</span>
+							</td>
+							
+							<td class="fm-remove">{% if sale_product_formset.can_delete %}{{ f.DELETE }}{% endif %}</td>
+						</tr>
+					{% endfor %}
+					</tbody>
+					<tfoot>
+						<tr>
+							<th colspan="4">
+								Total
+							</th>
+							<td class="total_discount">
+								<input class="form-control" id="id_total_discount" name="total_discount" placeholder="Total Discount" type="text" value="0.0" required />
+							</td>
+							<td class="total_net_amount">
+				                <input class="required form-control" id="id_total_net_amount" name="total_net_amount" placeholder="Total Net Amount" type="text" value="" />
+							</td>
+							<td class="total_tax_amount">
+								<input class="required form-control" id="id_total_tax_amount" name="total_tax_amount" placeholder="Total Tax Amount" type="text" value="0.0" required />
+							</td>
+							<td class="total">
+								 <input class="required form-control" id="id_total" name="total" placeholder="Total" type="text" value="0.0" required />
+							</td>
+						</tr>
+					</tfoot>
+				</table>
+				{{ sale_product_formset.management_form }}
+			</div>
+		</section>
+
+        <div class="clearfix"></div>
+		<div class="form-group"> 
+		    <div class="col-sm-offset-2 col-sm-10">
+		      <button type="submit" class="btn btn-primary">Submit</button>
+		    </div>
+		  </div>
+	</form>						
+{% endblock %}
+
+{% block static %}
+	{% load static %}
+	<link href="{% static 'css/bootstrap-datetimepicker.css' %}" rel="stylesheet">
+	<script type="text/javascript" src="{% static 'js/bootstrap-datetimepicker.js' %}" charset="UTF-8"></script>
+	<script type="text/javascript">
+	    $('#id_date').datetimepicker({
+	        format: "dd-mm-yyyy",
+	        weekStart: 1,
+	        todayBtn:  1,
+			autoclose: 1,
+			todayHighlight: 1,
+			startView: 2,
+			forceParse: 0,
+	        minView : 2
+	    });
+	</script>
+	<script type="text/javascript" src="{% static 'js/jquery.formset.js' %}"></script>
+	<script>
+		$(document).ready(function(){
+			$('.sale_product_formset table tr.form_set_row').formset({
+	            prefix: '{{ sale_product_formset.prefix }}',
+	            formCssClass: 'dynamic-formset1',
+	        });
+
+	        $('.dynamic-formset1-add .add-row.icon_add_item').click(function(){
+	        	$('.sale_product_formset table tr.form_set_row:last').removeClass('hidden');
+	        	$('.sale_product_formset table tr.form_set_row:last').addClass('countable');
+	        });
+
+	        function calculate(){
+	        	var total_net_amount = 0;
+	        	var total_tax_amount = 0;
+				var total = 0; 
+				var balance = 0; 
+				var total_discount =0;    		
+				
+				$('.sale_product_formset table tr[style!="display: none;"].form_set_row.countable').each(function(){
+					$this = $(this);
+					var quantity = parseFloat($this.find('.sale_product_quantity input').val());
+					if(!quantity){
+						quantity = 0;
+					}
+					var unit_price = parseFloat($this.find('.sale_product_unit_price input').val());
+					if(!unit_price){
+						unit_price = 0;
+					}
+					var output_gst = $this.find('.sale_product_output_gst input').val();
+					if(!output_gst){
+						output_gst = 0;
+					}
+					var offer = parseFloat($this.find('.sale_product_offer input').val());
+					if(!offer){
+						offer = 0;
+					}
+					var net_amount = quantity * unit_price - offer;
+					$this.find('.sale_product_amount input').val(net_amount.toFixed(2));
+
+					var tax_amount = net_amount*(output_gst/100);
+					$this.find('.sale_product_tax_amount input').val(tax_amount.toFixed(2));
+
+					var total_amount = net_amount + tax_amount
+					$this.find('.sale_product_total_amount input').val(total_amount.toFixed(2));
+
+					total_discount += offer
+					total_net_amount += net_amount;
+					total_tax_amount += tax_amount;
+					total += total_amount;
+				});
+
+				$('.total_discount input').val(total_discount.toFixed(2));
+				$('.total_net_amount input').val(total_net_amount.toFixed(2));
+				$('.total_tax_amount input').val(total_tax_amount.toFixed(2));
+				$('.total input').val(total);
+
+				var paid = parseFloat($('.paid input').val());
+				if(!paid){
+						paid = 0;
+					}
+				balance = total - paid
+				$('.balance input').val(balance.toFixed(2));
+			}
+	        
+	        calculate();
+
+	        function getProductUnitPrice($selector){
+	        	var $this = $selector;		
+	        	var url = "{% url 'sales:get_unit_price' %}";
+	        	var id = $this.val();
+	        	var $parent = $this.parents('tr.form_set_row');
+	        	if(id != '' && id != null){
+		        	$.ajax({
+		        		type : "GET",
+						url : url,
+						dataType : 'json',
+						data : {
+							id : id,
+						},
+						success : function(data) {
+							var status = data['status'];
+							var pk = data['pk'];
+							var unit_price = data['unit_price'];
+							var output_gst = data['output_gst']
+							
+							if (status == "true"){
+								$parent.find('.sale_product_unit_price input').val(unit_price);
+								$parent.find('.sale_product_output_gst input').val(output_gst);
+								
+								calculate();	
+								
+							}								
+						},
+		        	});	        		
+	        	}
+	        }
+	        
+	        $(document).on('change','span.sale_product_product select',function(){
+	        	$selector = $(this);
+	        	getProductUnitPrice($selector);
+	        });
+	        setInterval(function(){
+	        	calculate();
+	        },100);
+	        $('input[type=text]').focus(function () { 
+                $(this).select();
+            });
+	    });
+	</script>
+	{{form.media}}
+	{{f.media}}
+{% endblock %}

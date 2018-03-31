@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block headerbar %}
+    <div id="header-bar" class="col-sm-12 clearfix">
+        <h4 class="col-xs-4 col-sm-4">{{title}}</h4>
+         <div class="btn-group pull-right">
+         	<a href="{% url 'reports:export_xlsx' %}" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-download-alt visible-xs"></i><span class="hidden-xs">Excel</span></a>
+            <a href="{% url 'reports:print_vat' %}" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-print visible-xs"></i><span class="hidden-xs">Print</span></a>
+            <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#filter"><i class="glyphicon glyphicon-filter visible-xs"></i><span class="hidden-xs">Filter</span></button>
+        </div>
+    </div>
+{% endblock %}
+
+{% block filter %}
+    <div id="filter" class="col-sm-3 col-md-2 collapse width">
+        <div class="filter-content">
+            <form action="{% url 'reports:view_vat' %}">
+                <div class="row">
+                    <label class="col-xs-12" for="filter_q">Date Interval</label>
+                    <input id="from_date" type="text" class="required" name="from_date" placeholder="From Date"/>
+                    <input id="to_date" type="text" class="required" name="to_date" placeholder="To Date"/>
+                </div>
+                <section class="submitContainer">
+                    <input type="submit" value="Filter" class="btn btn-primary" />
+                </section>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div>
+        {% if start_date.date == end_date.date %}
+        <h3 class="text-center">GST Report <b>{{start_date|date:'d-m-y'}}</b></h3>
+        {% else %}
+        <h3 class="text-center">GST Report From <b>{{start_date|date:'d-m-y'}}</b> To <b>{{end_date|date:'d-m-y'}}</b></h3>
+        {% endif %}
+    </div>
+    <h3>Sales GST Report</h3>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Invoice No</th>
+                    <th>Invoice Date</th>
+                    <th>Value of Goods</th>
+                    <th>CGST Amount</th>
+                    <th>SGST Amount</th>
+                    <th>IGST Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sale_report in sales_report %}
+                <tr>
+                    <td>{{sale_report.0}}</td>
+                    <td>{{sale_report.1}}</td>
+                    <td>{{sale_report.2}}</td>
+                    <td>{{sale_report.3}}</td>
+                    <td>{{sale_report.4}}</td>
+                    <td>{{sale_report.5}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <tr>
+                <td><b>Total Sales CGST Amount</b></td>
+                <td><b>{{total_sales_cgst|floatformat:2}}</b></td>
+            </tr>
+            <tr>
+                <td><b>Total Sales SGST Amount</b></td>
+                <td><b>{{total_sales_sgst|floatformat:2}}</b></td>
+            </tr>
+            <tr>
+                <td><b>Total Sales IGST Amount</b></td>
+                <td><b>{{total_sales_igst|floatformat:2}}</b></td>
+            </tr>
+            <tr>
+                <td><b>Total Sales GST Amount</b></td>
+                <td><b>{{total_sales_tax|floatformat:2}}</b></td>
+            </tr>
+        </table>
+    </div>
+    <h3>Purchases GST Report</h3>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Invoice No</th>
+                    <th>Invoice Date</th>
+                    <th>Value of Goods</th>
+                    <th>GST Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for purchase_report in purchases_report %}
+                <tr>
+                    <td>{{purchase_report.0}}</td>
+                    <td>{{purchase_report.1}}</td>
+                    <td>{{purchase_report.2}}</td>
+                    <td>{{purchase_report.3}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <tr>
+                <td><b>Total Purchases GST Amount</b></td>
+                <td><b>{{total_purchases_tax|floatformat:2}}</b></td>
+            </tr>
+        </table>
+    </div>
+{% endblock %}
+
+{% block static %}
+    {% load static %}
+    <link href="{% static 'css/bootstrap-datepicker.css' %}" rel="stylesheet">
+    <script type="text/javascript" src="{% static 'js/bootstrap-datepicker.js' %}" charset="UTF-8"></script>
+    <script type="text/javascript">
+        $('#from_date,#to_date').datepicker({
+            format: "dd-mm-yyyy",
+            weekStart: 1,
+            autoclose: 1,
+            todayBtn:  1,
+            todayHighlight: 1,
+            forceParse: 0,
+            minView : 2
+        });
+    </script>
+{% endblock %}

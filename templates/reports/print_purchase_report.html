@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+table tr.top table td{
+        padding-bottom:20px;
+        width: 1000%;
+}
+table tr.information table td{
+        padding-bottom:40px;
+}
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+.print img{
+    width: 40px;
+    height:40px;
+  
+}
+@media print
+{   
+    .no-print, .no-print *
+    {
+        display: none !important;
+    }
+}
+</style>
+</head>
+<body>
+{% load static %}
+{% if report %}
+    <div class="table-responsive">
+        <table class="table">
+            <tr class="top">
+                <td colspan="5">
+                    <table>
+                        <tr>
+                            <td class="title">
+                                <h2>{{current_shop}}</h2>
+                            </td>
+                            <td class="no-print">
+                            <div class="print no-print">
+                                
+                                <img src="{% static 'images/print.png' %}" onClick="window.print()" />
+                                
+                            </div>
+                            </td>
+
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+        <tr class="information" >
+            <td colspan="5">
+                {% with last_element=report|last %}
+                    {% if report.0.0 == last_element.0 %}
+                        <h3>Purchase Report <b>{{report.0.0}}</b></h3>
+                        {% else %}
+                        <h3>Purchase Report From <b>{{report.0.0}}</b> To <b>{{last_element.0}}</b></h3>
+                    {% endif %}
+                {% endwith %}
+            </td>
+        </tr>
+          <tr>
+            <th>Date</th>
+            <th>Purchase</th>
+          </tr>
+          {% for daily_report in report %}
+          <tr>
+            <td>{{daily_report.0}}</td>
+            <td>{{daily_report.1}}</td>
+          </tr>
+          {% endfor %}
+            
+        </table>
+    </div>
+    <div class="table-responsive">
+        <table class="table">
+            <tr>
+                <td><b>Total Income</b></td>
+                <td><b>{{total_report.0}}</b></td>
+            </tr>
+        </table>
+    </div>
+{% else %}
+    {% include 'includes/not_found.html' %}
+{% endif %}
+{% block static %}
+    {% load static %}
+{% endblock %}
+</body>
+</html>
+
+

@@ -1,0 +1,329 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block headerbar %}
+	<div id="header-bar" class="col-sm-12 clearfix">
+        <h4 class="col-xs-4 col-sm-4">{{title}}</h4>
+    </div>
+{% endblock %}
+
+{% block content %}
+
+	{% if errors %}
+		<div class="alert alert-danger">
+		  <strong>Error!</strong> 
+		    {{errors | safe}}
+		</div>
+	{% endif %}
+	{% include 'includes/create_product_popup.html' %}
+	{% include 'includes/create_vendor_popup.html' %}
+
+	<form action="{{ url }}" method="post" class="form-horizontal">
+		{% csrf_token %}
+
+		<div class="form-group {% if form.date.errors %} has-error {% endif %} col-sm-6">
+            <label for="{{form.date.label.id_for_label}}" class="col-sm-5 control-label">{{form.date.label}}</label>
+            <div class="col-sm-5">
+                <div class="fg-line">
+                    {{form.date}}
+                </div>
+            </div>
+        </div>
+        <div class="form-group {% if form.vendor.errors %} has-error {% endif %} col-sm-6">
+            <label for="{{form.vendor.label.id_for_label}}" class="col-sm-5 control-label">{{form.vendor.label}} <a href="#" data-toggle="modal" data-target="#create-vendor"><span class="glyphicon glyphicon-plus"></span></a></label>
+            <div class="col-xs-12 col-sm-7">
+                <div class="fg-line">
+                    {{form.vendor}}
+                </div>
+            </div>
+        </div>
+		<div class="clearfix"></div>
+		<div class="form-group {% if form.purchase_date.errors %} has-error {% endif %} col-sm-6">
+            <label for="{{form.purchase_date.label.id_for_label}}" class="col-sm-5 control-label">{{form.purchase_date.label}}</label>
+            <div class="col-sm-5">
+                <div class="fg-line">
+                    {{form.purchase_date}}
+                </div>
+            </div>
+        </div>
+        <div class="form-group {% if form.purchase_type.errors %} has-error {% endif %} col-sm-6">
+            <label for="{{form.purchase_type.label.id_for_label}}" class="control-label col-sm-5">{{form.purchase_type.label}}</label>
+            <div class="col-sm-7">
+                <div class="fg-line">
+                    {{form.purchase_type}}
+                </div>
+            </div>
+        </div>
+        <div class="form-group {% if form.invoice_no.errors %} has-error {% endif %} col-sm-6">
+            <label for="{{form.invoice_no.label.id_for_label}}" class="col-sm-5 control-label">{{form.invoice_no.label}}</label>
+            <div class="col-sm-5">
+                <div class="fg-line">
+                    {{form.invoice_no}}
+                </div>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+
+		<section class="innerBox">
+				<h3>Purchased Item</h3>
+				<div class="purchase_product_formset table-responsive">			        
+					<table class="table">
+						<thead>
+							<tr>
+								<th>SL.No</th>
+								<th>Product <a href="#" data-toggle="modal" data-target="#create-product"><span class="glyphicon glyphicon-plus"></span></a></th>
+								<th>Unit Price</th>
+								<th>GST(%)</th>
+								<th>Quantity</th>
+								<th>Discount</th>
+								<th>Net Amount</th>
+								<th>GST Amount</th>
+								<th>Total</th>
+								<th></th>
+							</tr>	
+						</thead>
+						<tbody>
+							{% for form in purchase_product_formset.forms %}			    
+							<tr class="{% if form.instance.product.untaxed == True and current_user_profile.tax_only == True %}hidden{% else %}countable{% endif %} form_set_row">
+								<td class="sl_no"></td>
+								<td>
+									{{ form.id }}
+									<span class="purchase_product_product">									
+										{{ form.product }}
+									</span>
+								</td>
+								<td>
+									<span class="purchase_product_unit_cost">
+										{{ form.unit_cost}}
+									</span>
+								</td>
+								<td>
+									<span class="purchase_product_input_tax">
+										{{ form.input_gst}}
+									</span>
+								</td>
+								<td>
+									<span class="purchase_product_quantity">
+										{{ form.quantity }}
+									</span>
+								</td>
+								<td>
+									<span class="purchase_product_offer">
+										{{ form.offer}}
+									</span>
+								</td>
+								<td>
+									<span class="purchase_product_amount">
+										{{ form.amount }}
+									</span>
+								</td>
+								<td>
+									<span class="purchase_product_tax_amount">
+										{{ form.tax_amount }}
+									</span>
+								</td>
+								<td>
+									<span class="purchase_product_total_amount">
+										{{ form.total_amount }}
+									</span>
+								</td>
+								<td class="fm-remove">{% if purchase_product_formset.can_delete %}{{ form.DELETE }}{% endif %}</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+						<tfoot>
+							<tr>
+								<th colspan="5">Total</th>
+								<td class="total_discount">
+									<input class="form-control" id="id_total_discount" name="total_discount" placeholder="Total Discount" type="text" value="0.0" required />
+								</td>
+								<td class="total_net_amount">
+					                <input class="required form-control" id="id_total_net_amount" name="total_net_amount" placeholder="Total Net Amount" type="text" value="" />
+								</td>
+								<td class="total_tax_amount">
+									<input class="required form-control" id="id_total_tax_amount" name="total_tax_amount" placeholder="Total Tax Amount" type="text" value="0.0" required />
+								</td>
+								<td class="total">
+									 <input class="required form-control" id="id_total" name="total" placeholder="Total" type="text" value="0.0" required />
+								</td>
+							</tr>
+						</tfoot>						
+					</table>
+					{{ purchase_product_formset.management_form }}
+				</div>
+			</section>
+
+        <div class="clearfix"></div>
+        <div class="form-group {% if form.other_charges.errors %} has-error {% endif %} col-sm-6">
+            <label for="{{form.other_charges.label.id_for_label}}" class="col-sm-4 control-label">{{form.other_charges.label}}</label>
+            <div class="col-sm-8">
+                <div class="fg-line">
+                    {{form.other_charges}}
+                </div>
+            </div>
+        </div>
+        <div class="form-group {% if form.final_total.errors %} has-error {% endif %} col-sm-6">
+            <label for="{{form.final_total.label.id_for_label}}" class="col-sm-4 control-label">Total</label>
+            <div class="col-sm-8">
+                <div class="fg-line">
+                    {{form.final_total}}
+                </div>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+        <div class="form-group {% if form.paid.errors %} has-error {% endif %} col-sm-6">
+            <label for="{{form.paid.label.id_for_label}}" class="col-sm-4 control-label">{{form.paid.label}}</label>
+            <div class="col-sm-8">
+                <div class="fg-line paid">
+                    {{form.paid}}
+                </div>
+            </div>
+        </div>
+        <div class="form-group {% if form.balance.errors %} has-error {% endif %} col-sm-6">
+            <label for="{{form.balance.label.id_for_label}}" class="col-sm-4 control-label">{{form.balance.label}}</label>
+            <div class="col-sm-8">
+                <div class="fg-line balance">
+                    {{form.balance}}
+                </div>
+            </div>
+        </div>
+		<div class="form-group"> 
+		    <div class="col-sm-offset-2 col-sm-10">
+		      <button type="submit" class="btn btn-primary">Submit</button>
+		    </div>
+		  </div>
+	</form>				
+{% endblock %}
+
+{% block static %}
+	{% load static %}
+	<link href="{% static 'css/bootstrap-datetimepicker.css' %}" rel="stylesheet">
+	<script type="text/javascript" src="{% static 'js/bootstrap-datetimepicker.js' %}" charset="UTF-8"></script>
+	<script type="text/javascript">
+	    $('#id_date,#id_purchase_date').datetimepicker({
+	       	format: "dd-mm-yyyy",
+	        weekStart: 1,
+	        todayBtn:  1,
+			autoclose: 1,
+			todayHighlight: 1,
+			startView: 2,
+			forceParse: 0,
+			minView : 2
+	    });
+	</script>
+	<script type="text/javascript" src="{% static 'js/jquery.formset.js' %}"></script>
+	<script>
+		$(document).ready(function(){	
+			$('.purchase_product_formset table tr.form_set_row').formset({
+	            prefix: '{{ purchase_product_formset.prefix }}',
+	            formCssClass: 'dynamic-formset1'
+	        });
+	        $('.dynamic-formset1-add .add-row.icon_add_item').click(function(){
+	        	$('.purchase_product_formset table tr.form_set_row:last').removeClass('hidden');
+	        	$('.purchase_product_formset table tr.form_set_row:last').addClass('countable');
+	        });
+			function calculate(){
+				var total_net_amount = 0;
+	        	var total_tax_amount = 0;
+				var total = 0; 
+				var balance = 0;   
+				var total_discount =0;  		
+				
+				$('.purchase_product_formset table tr[style!="display: none;"].form_set_row.countable').each(function(index){
+					$this = $(this);
+					$this.find('.sl_no').html(index+1);
+					var quantity = parseFloat($this.find('.purchase_product_quantity input').val());
+					if(!quantity){
+						quantity = 0;
+					}
+					var unit_cost = parseFloat($this.find('.purchase_product_unit_cost input').val());
+					if(!unit_cost){
+						unit_cost = 0;
+					}
+					var input_tax = parseFloat($this.find('.purchase_product_input_tax input').val());
+					if(!input_tax){
+						input_tax = 0;
+					}
+					var offer = parseFloat($this.find('.purchase_product_offer input').val());
+					if(!offer){
+						offer = 0;
+					}
+					var net_amount = quantity * unit_cost - offer;
+					$this.find('.purchase_product_amount input').val(net_amount.toFixed(2));
+
+					var tax_amount = net_amount*(input_tax/100);
+					$this.find('.purchase_product_tax_amount input').val(tax_amount.toFixed(2));
+
+					var total_amount = net_amount + tax_amount
+					$this.find('.purchase_product_total_amount input').val(total_amount.toFixed(2));
+
+					total_discount += offer
+					total_net_amount += net_amount;
+					total_tax_amount += tax_amount;
+					total += total_amount;
+				});
+				
+				$('.total_discount input').val(total_discount.toFixed(2));
+				$('.total_net_amount input').val(total_net_amount.toFixed(2));
+				$('.total_tax_amount input').val(total_tax_amount.toFixed(2));
+				$('.total input').val(total.toFixed(2));
+
+				var other_charges =  parseFloat($('#id_other_charges').val());
+				if(!other_charges){
+					other_charges = 0;
+				}
+				var final_total = total + other_charges;
+				$('#id_final_total').val(final_total.toFixed(2));
+
+				var paid = parseFloat($('.paid input').val());
+				if(!paid){
+						paid = 0;
+					}
+				balance = final_total - paid
+				$('.balance input').val(balance.toFixed(2));
+			}
+	        
+	        calculate();
+
+	       	function getInputTax($selector){
+	        	var $this = $selector;		
+	        	var url = "{% url 'purchases:get_input_tax' %}";
+	        	var id = $this.val();
+	        	var $parent = $this.parents('tr.form_set_row');
+	        	if(id != '' && id != null){
+		        	$.ajax({
+		        		type : "GET",
+						url : url,
+						dataType : 'json',
+						data : {
+							id : id,
+						},
+						success : function(data) {
+							var status = data['status'];
+							var input_tax = data['input_tax']
+							
+							if (status == "true"){
+								$parent.find('.purchase_product_input_tax input').val(input_tax);
+								
+								calculate();	
+								
+							}								
+						},
+		        	});	        		
+	        	}
+	        }
+	        $(document).on('change','span.purchase_product_product select',function(){
+	        	$selector = $(this);
+	        	getInputTax($selector);
+	        });
+	        setInterval(function(){
+	        	calculate();
+	        },100);
+	        $('input[type=text]').focus(function () { 
+                $(this).select();
+            });
+        });
+	</script>
+	{{form.media}}
+	{{f.media}}
+{% endblock %}

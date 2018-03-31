@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block headerbar %}
+	<div id="header-bar" class="col-sm-12 clearfix">
+        <h4 class="col-xs-4 col-sm-4">{{title}}</h4>
+    </div>
+{% endblock %}
+
+{% block content %}
+	{% if errors %}
+		<div class="alert alert-danger">
+		  <strong>Error!</strong> 
+		    {{errors | safe}}
+		</div>
+	{% endif %}
+	
+	<form action="{{ url }}" method="post" class="form-horizontal">
+		{% csrf_token %}
+		{% for field in form %}
+		  <div class="form-group {% if field.errors %} has-error {% endif %}">
+		    <label class="control-label col-sm-2" for="{{field.id_for_label}}">{{field.label}} :</label>
+		    <div class="col-sm-8">
+		      {{field}}
+		    </div>
+		  </div>
+		  {% if field.help_text %}
+	        <p class="help">{{ field.help_text|safe }}</p>
+	      {% endif %}
+		{% endfor %}
+		
+		<div class="form-group"> 
+		    <div class="col-sm-offset-2 col-sm-10">
+		    	<button type="submit" class="btn btn-primary">Submit</button>
+		    </div>
+		</div>
+	</form>
+{% endblock %}
+
+{% block static %}
+	{% load static %}
+	<link href="{% static 'css/bootstrap-datetimepicker.css' %}" rel="stylesheet">
+	<script type="text/javascript" src="{% static 'js/bootstrap-datetimepicker.js' %}" charset="UTF-8"></script>
+	<script type="text/javascript">
+	    $('#id_date,#id_purchase_date').datetimepicker({
+	       	format: "dd-mm-yyyy",
+	        weekStart: 1,
+	        todayBtn:  1,
+			autoclose: 1,
+			todayHighlight: 1,
+			startView: 2,
+			forceParse: 0,
+			minView : 2
+	    });
+	    $('input[type=text]').focus(function () { 
+            $(this).select();
+        });
+	</script>
+	{{form.media}}
+{% endblock %}

@@ -1,0 +1,26 @@
+{% load i18n %}
+
+
+{%block content %}
+{% load static %}
+    <section id="spotlight">
+		<section class="wrapper">
+			<section class="main">
+				<h2 style="text-align:center;">Error 404</h2>
+				<span><small class="zmdi zmdi-close"></small></span>
+			</section>
+		</section>
+	</section><!--(#spotlight)-->
+</section><!--(#top)-->
+<section class="l3">
+	<section class="one">
+		<section class="wrapper">
+			<div class="content">
+				<p class="mb20" style="text-align:center;"><img style="width:auto;" src="{% static 'images/404_man.jpg' %}" alt="image" title="image" /></p>
+				<h3><p class="mb20 error" style="text-align:center;" color="red">{{short_description}}</p></h3>
+			</div>
+			<br class="clear" />
+		</section>
+	</section>
+</section>
+{% endblock %}	

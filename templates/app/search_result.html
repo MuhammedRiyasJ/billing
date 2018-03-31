@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+
+{% block headerbar %}
+    <div id="header-bar" class="col-sm-12 clearfix">
+        <h4 class="col-xs-4 col-sm-4">{{title}}</h4>
+    </div>
+{% endblock %}
+
+{% block content %}
+                
+        {% if product_instances %}
+            <h4 class="col-sm-12"><b>{{title1}}</b></h4>
+            <div class="clearfix"></div>
+            <div class="table-responsive">
+                <table id="data-table-basic" class="table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Stock</th>
+                            <th>Price</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for instance in product_instances %}
+                            <tr class="">
+                                <td><a href="{% url 'products:view_product' pk=instance.pk %}">{{instance.name}}</a></td>
+                                <td>{{instance.stock}}</td>
+                                <td>{{instance.unit_price|default:"-"}}</td>
+                                <td>{{instance.description|default:"-"}}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>   
+        {% endif %}                       
+                
+        {% if vendor_instances %}
+            <h4 class="col-sm-12"><b>{{title2}}</b></h4>
+            <div class="clearfix"></div>
+            <div class="table-responsive">
+                <table  class="table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Address</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for instance in vendor_instances %}
+                            <tr class="">
+                                <td><a href="{% url 'vendors:view_vendor' pk=instance.pk %}">{{instance.name}}</a></td>
+                                <td>{{instance.phone|default:"-"}}</td>
+                                <td>{{instance.address|default:"-"}}</td>
+                                <td>{{instance.balance}}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>   
+        {% endif %}                       
+                
+        {% if customer_instances %}
+            <h4 class="col-sm-12"><b>{{title3}}</b></h4>
+            <div class="clearfix"></div>
+            <div class="table-responsive">
+                <table id="data-table-basic" class="table table-vmiddle">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Address</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for instance in customer_instances %}
+                            <tr class="">
+                                <td><a href="{% url 'customers:view_customer' pk=instance.pk %}">{{instance.name}}</a></td>
+                                <td>{{instance.phone|default:"-"}}</td>
+                                <td>{{instance.address|default:"-"}}</td>
+                                <td>{{instance.balance}}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}    
+        
+        {% if not product_instances and not customer_instances and not vendor_instances %}
+            {% include 'includes/not_found.html' %}
+        {% endif %}                     
+{% endblock %}
+
+{% block static %}
+    {% load static %}
+{% endblock %}

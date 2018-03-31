@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+
+{% block headerbar %}
+    <div id="header-bar" class="col-sm-12 clearfix">
+        <h4 class="col-xs-4 col-sm-4">{{title}}</h4>
+    </div>
+{% endblock %}
+
+{% block filter %}
+    <div id="filter" class="col-sm-3 col-md-2 collapse width">
+        <div class="filter-content">
+            <form action="{% url 'app:view_notifications' %}">
+                <div class="row">
+                    <label class="col-xs-12" for="filter_q">Query</label>
+                    <input id="filter_q" type="text" name="q" placeholder="Enter Query..."/>
+                </div>
+                <section class="submitContainer">
+                    <input type="submit" value="Filter" class="btn btn-primary" />
+                </section>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+
+    {% if message %}
+        <div class="alert alert-success alert-dismissable fade in">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <strong>Success!</strong> {{message}}
+        </div>
+    {% endif %}
+
+    <div class="card">
+                
+        {% if instances %}
+            
+            <div class="table-responsive">
+                <table id="data-table-basic" class="table table-vmiddle">
+                    <thead>
+                        <tr>
+                            <th>Message</th>
+                            <th>Time</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for instance in instances %}
+                            {% if instance.is_read %}
+                                <tr class="check_items_row read">
+                                    <td>{{instance.message|safe}}</td>
+                                    <td>{{instance.time}}</td>
+                                    <td>
+                                        <a href="{% url 'app:mark_as_not_read' pk=instance.pk %}" type="submit" class="">Mark as not read</a>
+                                    </td>
+                                    {% if not instance.is_deleted %}
+                                        <td>
+                                            <a href="{% url 'app:mark_as_deleted' pk=instance.pk %}" type="submit" class="">Delete</a>
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            {% else %}
+                                <tr class="check_items_row not_read">
+                                    <td>{{instance.message|safe}}</td>
+                                    <td>{{instance.time}}</td>
+                                    <td class="">
+                                        <a href="{% url 'app:mark_as_read' pk=instance.pk %}" type="submit" class="">Mark as read</a>
+                                    </td>
+                                    {% if not instance.is_deleted %}
+                                        <td>
+                                            <a href="{% url 'app:mark_as_deleted' pk=instance.pk %}" type="submit" class="">Delete</a>
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>   
+        {% else %}
+            {% include 'includes/not_found.html' %}
+        {% endif %}                       
+    </div>
+{% endblock %}
+
+{% block static %}
+    {% load static %}
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load templatetags %}
+
+{% block headerbar %}
+    <div id="header-bar" class="col-sm-12 clearfix">
+        <h4 class="col-xs-4 col-sm-4">{{title}}</h4>
+         <div class="btn-group pull-right">
+              <a href="{% url 'purchases:create_purchase' %}" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-file visible-xs"></i><span class="hidden-xs">Create</span></a>
+              <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#filter"><i class="glyphicon glyphicon-filter visible-xs"></i><span class="hidden-xs">Filter</span></button>
+        </div>
+    </div>
+{% endblock %}
+
+{% block filter %}
+    <div id="filter" class="col-sm-3 col-md-2 collapse width">
+        <div class="filter-content">
+            <form action="{% url 'purchases:view_purchases' %}">
+                <div class="row">
+                    <label class="col-xs-12" for="filter_q">Query</label>
+                    <input id="filter_q" type="text" name="q" placeholder="Enter Query..."/>
+                </div>
+                <section class="submitContainer">
+                    <input type="submit" value="Filter" class="btn btn-primary" />
+                </section>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+
+    {% if message %}
+        <div class="alert alert-success alert-dismissable fade in">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <strong>Success!</strong> {{message}}
+        </div>
+    {% endif %}
+	<div class="card">
+                
+        {% if instances %}
+        
+        <div class="table-responsive">
+            <table id="data-table-basic" class="table table-striped table-vmiddle">
+                <thead>
+                    <tr>
+                        <th>Purchase Id</th>
+                        <th>Vendor</th>
+                        <th>Date</th>
+                        <th>Total</th>
+                        {% if not current_user_profile.tax_only %}
+                        <th>Paid</th>
+                        <th>Balance</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                	{% for instance in instances %}
+                    {% if instance|purchase_products_exists:current_user_profile.tax_only %}
+                    <tr class="check_items_row">
+                        <td><a href="{% url 'purchases:view_purchase' pk=instance.pk %}">{{instance.purchase_id}}</a></td>
+                        <td><a href="{% url 'vendors:view_vendor' pk=instance.vendor.pk %}">{{instance.vendor|default:'-'}}</a></td>
+                        <td>{{instance.date|date:'d-m-y'}}</td>
+                        <td>{{instance|purchase_total:current_user_profile.tax_only}}</td>
+                        {% if not current_user_profile.tax_only %}
+                		<td>{{instance.paid}}</td>
+                        <td>{{instance.balance}}</td>
+                        {% endif %}
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="pagination">
+                <span class="step-links">
+                    {% if instances.has_previous %}
+                        <a href="?page={{ instances.previous_page_number }}{% if query %}&q={{query}}{% endif %}" class="glyphicon glyphicon-chevron-left">&nbsp;</a>
+                    {% endif %}
+
+                    <span class="current">
+                        Page {{ instances.number }} of {{ instances.paginator.num_pages }}.
+                    </span>
+
+                    {% if instances.has_next %}
+                        <a href="?page={{ instances.next_page_number }}{% if query %}&q={{query}}{% endif %}" class="glyphicon glyphicon-chevron-right">&nbsp;</a>
+                    {% endif %}
+                </span>
+            </div>
+        {% else %}
+        	{% include 'includes/not_found.html' %}
+        {% endif %}            
+    </div>
+            
+{% endblock %}
+
+{% block static %}
+	{% load static %}
+{% endblock %}

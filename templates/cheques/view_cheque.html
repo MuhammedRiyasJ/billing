@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+
+{% block headerbar %}
+	<div id="header-bar" class="col-sm-12 clearfix">
+        <h4 class="col-xs-6 col-sm-4">{{title}}</h4>
+         <div class="btn-group pull-right">
+              <a href="{% url 'cheques:create_cheque' %}" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-file visible-xs"></i><span class="hidden-xs">Create</span></a>
+              <a href="{% url 'cheques:edit_cheque' pk=instance.pk %}" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-pencil visible-xs"></i><span class="hidden-xs">Edit</span></a>
+              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirm-delete" ><i class="glyphicon glyphicon-trash visible-xs"></i><span class="hidden-xs">Delete</span></button>
+        </div>
+    </div>
+    <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content alert alert-danger">
+            <div class="modal-body">
+                Are You Sure ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <a href="{% url 'cheques:delete_cheque' pk=instance.pk %}" class="btn btn-danger btn-ok">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+
+	{% if message %}
+        <div class="alert alert-success alert-dismissable fade in">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <strong>Success!</strong> {{message}}
+        </div>
+    {% endif %}
+
+    <div class="card">
+    	<div class="card-header">
+	        <h3>Basic Info<small></small></h2>
+	 	</div>
+	 	<div class="card-body">
+	    	<table class="table table-striped" >
+	    		<tr>
+	    			<td>Date</td>
+	    			<td>{{instance.date|date:'d-m-y'}}</td>
+	    		</tr>
+	    		<tr>
+	    			<td>Vendor</td>
+	    			<td>{{instance.vendor.name}}</td>
+	    		</tr>
+	    		<tr>
+	    			<td>Name</td>
+	    			<td>{{instance.name}}</td>
+	    		</tr>
+	    		<tr>
+	    			<td>Cheque Number</td>
+	    			<td>{{instance.cheque_number|default:"-"}}</td>
+	    		</tr>
+	    		<tr>
+	    			<td>Account Number</td>
+	    			<td>{{instance.account_number|default:"-"}}</td>
+	    		</tr>
+	    		<tr>
+	    			<td>Amount</td>
+	    			<td>{{instance.amount|default:"-"}}</td>
+	    		</tr>
+	    		<tr>
+	    			<td>Details</td>
+	    			<td>{{instance.details}}</td>
+	    		</tr>
+	    	</table>
+    	</div>
+    </div>
+	<div class="card">
+	    <div class="card-header">
+	        <h3>Created &amp; Updated <small></small></h3>
+	    </div>
+	    <div class="card-body">
+		    <table class="table table-striped">
+			    	<tr>
+		    			<td>Created</td>
+		    			<td>{{instance.date_added|date:'d-m-y'}}</td>
+		    		</tr>
+		    		<tr>
+		    			<td>Updated</td>
+		    			<td>{{instance.date_updated|date:'d-m-y'|default:"-"}}</td>
+		    		</tr>
+		    </table>
+	    </div>
+	</div>
+	<div class="card">
+	    <div class="card-header">
+	        <h3>Creator &amp; Updater <small></small></h3>
+	    </div>
+	    <div class="card-body">
+		    <table class="table table-striped">
+			    	<tr>
+		    			<td>Creator</td>
+		    			<td>{{instance.creator}}</td>
+		    		</tr>
+		    		<tr>
+		    			<td>Updater</td>
+		    			<td>{{instance.updater|default:"-"}}</td>
+		    		</tr>
+		    </table>
+	    </div>
+	</div>
+{% endblock %}
+
+{% block static %}
+	{% load static %}
+{% endblock %}
+                    

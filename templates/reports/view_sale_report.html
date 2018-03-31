@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block headerbar %}
+    <div id="header-bar" class="col-sm-12 clearfix">
+        <h4 class="col-xs-4 col-sm-4">{{title}}</h4>
+         <div class="btn-group pull-right">
+            <a href="{% url 'reports:print_sale_report'%}" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-print visible-xs"></i><span class="hidden-xs">Print</span></a>
+            <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#filter"><i class="glyphicon glyphicon-filter visible-xs"></i><span class="hidden-xs">Filter</span></button>
+        </div>
+    </div>
+{% endblock %}
+
+{% block filter %}
+    <div id="filter" class="col-sm-3 col-md-2 collapse width">
+        <div class="filter-content">
+            <form action="{% url 'reports:view_sale_report' %}">
+                <div class="row">
+                    <label class="col-xs-12" for="filter_q">Date Interval</label>
+                    <input id="from_date" type="text" class="required" name="from_date" placeholder="From Date"/>
+                    <input id="to_date" type="text" class="required" name="to_date" placeholder="To Date"/>
+                </div>
+                <section class="submitContainer">
+                    <input type="submit" value="Filter" class="btn btn-primary" />
+                </section>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div>
+        {% if start_date.date == end_date.date %}
+        <h3>Sales Report <b>{{start_date|date:'d-m-y'}}</b></h3>
+        {% else %}
+        <h3>Sales Report From <b>{{start_date|date:'d-m-y'}}</b> To <b>{{end_date|date:'d-m-y'}}</b></h3>
+        {% endif %}
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Sale</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for daily_report in report %}
+                <tr>
+                    <td>{{daily_report.0}}</td>
+                    <td>{{daily_report.1}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <tr>
+                <td><b>Total Sale</b></td>
+                <td><b>{{total_income|floatformat:2}}</b></td>
+            </tr>
+            {% if current_user_profile.tax_only == False and admin %}
+            <tr>
+                <td><b>Total Expense</b></td>
+                <td><b>{{total_expense|floatformat:2}}</b></td>
+            </tr>
+            {% endif %}
+        </table>
+    </div>
+{% endblock %}
+
+{% block static %}
+    {% load static %}
+    <link href="{% static 'css/bootstrap-datepicker.css' %}" rel="stylesheet">
+    <script type="text/javascript" src="{% static 'js/bootstrap-datepicker.js' %}" charset="UTF-8"></script>
+    <script type="text/javascript">
+        $('#from_date,#to_date').datepicker({
+            format: "dd-mm-yyyy",
+            weekStart: 1,
+            autoclose: 1,
+            todayBtn:  1,
+            todayHighlight: 1,
+            forceParse: 0,
+            minView : 2
+        });
+    </script>
+{% endblock %}

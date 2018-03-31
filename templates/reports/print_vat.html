@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <style>
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+.print img{
+    width: 40px;
+    height:40px; 
+}
+.title{
+    padding-left: 50px;
+    text-align: center;
+}
+@media print
+{   
+    .no-print, .no-print *
+    {
+        display: none !important;
+    }
+}
+</style>
+        {% load static %}
+         <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    </head>
+<body>
+    <div class="table-responsive">
+        <table class="table">
+            <tr class="top">
+                <td colspan="5">
+                    <table>
+                        <tr>
+                            <td class="title">
+                                <h2>{{current_shop}}</h2>
+                            </td>
+                            <td class="no-print">
+                            <div class="print no-print">
+                                
+                                <img src="{% static 'images/print.png' %}" onClick="window.print()" />
+                                
+                            </div>
+                            </td>
+
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="container">
+        <div>
+            {% if start_date.date == end_date.date %}
+            <h3 class="text-center">GST Report <b>{{start_date|date:'d-m-y'}}</b></h3>
+            {% else %}
+            <h3 class="text-center">GST Report From <b>{{start_date|date:'d-m-y'}}</b> To <b>{{end_date|date:'d-m-y'}}</b></h3>
+            {% endif %}
+        </div>
+        <h3>Sales Tax Report</h3>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Invoice No</th>
+                        <th>Invoice Date</th>
+                        <th>Value of Goods</th>
+                        <th>CGST Amount</th>
+                        <th>SGST Amount</th>
+                        <th>IGST Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sale_report in sales_report %}
+                    <tr>
+                        <td>{{sale_report.0}}</td>
+                        <td>{{sale_report.1}}</td>
+                        <td>{{sale_report.2}}</td>
+                        <td>{{sale_report.3}}</td>
+                        <td>{{sale_report.4}}</td>
+                        <td>{{sale_report.5}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="table-responsive">
+            <table class="table">
+                <tr>
+                    <td><b>Total Sales CGST Amount</b></td>
+                    <td><b>{{total_sales_cgst|floatformat:2}}</b></td>
+                </tr>
+                <tr>
+                    <td><b>Total Sales SGST Amount</b></td>
+                    <td><b>{{total_sales_sgst|floatformat:2}}</b></td>
+                </tr>
+                <tr>
+                    <td><b>Total Sales IGST Amount</b></td>
+                    <td><b>{{total_sales_igst|floatformat:2}}</b></td>
+                </tr>
+                <tr>
+                    <td><b>Total Sales GST Amount</b></td>
+                    <td><b>{{total_sales_tax|floatformat:2}}</b></td>
+                </tr>
+            </table>
+        </div>
+        <h3>Purchases GST Report</h3>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Invoice No</th>
+                        <th>Invoice Date</th>
+                        <th>Value of Goods</th>
+                        <th>GST Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for purchase_report in purchases_report %}
+                    <tr>
+                        <td>{{purchase_report.0}}</td>
+                        <td>{{purchase_report.1}}</td>
+                        <td>{{purchase_report.2}}</td>
+                        <td>{{purchase_report.3}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="table-responsive">
+            <table class="table">
+                <tr>
+                    <td><b>Total Purchases GST</b></td>
+                    <td><b>{{total_purchases_tax|floatformat:2}}</b></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+{% block static %}
+{% load static %}
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+{% endblock %}
+</body>
+</html>
